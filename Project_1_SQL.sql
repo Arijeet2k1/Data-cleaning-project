@@ -23,44 +23,37 @@ USE PROJECT_1;
 		-- Operating System: Textual identifier for the phone's software platform (e.g., Android 13)
         
 	-- Finding the Problems with data
-    
+
 		-- Dirty Data
-            -- model: The name "OPPO" is writen in 2 different ways i.e- ("OPPO" and "Oppo")
+            # model: The name "OPPO" is writen in 2 different ways i.e- ("OPPO" and "Oppo")
 				-- so we have to make both of them equal for further analysis
                 -- row 755 will be deleted because there is a data of ipod 
 			-- price: all rows contains "," this symbol which needs to be removed
 			-- rating: THERE ARE SO MANY NULL VALUES IN THIS COLUMN
-            -- processor: There are so many rows where the processor name
+            # processor: There are so many rows where the processor name
 				-- is not clearly mentioned or mentioned with different names like
                 -- "apple a14" and "bionic a12",
-                -- many values are missing in processor name
-			-- ram: at some points ram and rom data is given in mb
-				-- at some points the data is given without mentioning ram or rom
-                -- some places the data is shown as ( Unisoc T107 & T117 )
+                -- many processor names are not given in processor column
+			# ram: in some rows ram and rom data is given in mb
+				-- in some rows the data is given without mentioning ram or rom
                 -- unnecessary symbols are there in the data like this -> "â","€","‰"
-			-- battery: remove symbols like "â€‰"
-            -- display: revove symbols like "â€‰"
-            -- camera: revove symbols like "â€‰"
-            -- card: null values
+			# battery: remove symbols like "â€‰"
+            # display: revove symbols like "â€‰"
+            # camera: revove symbols like "â€‰"
+            # card: null values
 				-- revove symbols like "â€‰"
-            -- os: null values
-            
+            # os: null values
 		-- Messy Data
-			-- processor: The data of "Processor name", "no of cores", "speed of the processor" will be seperated in 3 different columns
+			# processor: The data of "Processor name" will be seperated in different column
 				-- other column data is also inserted in this column like- "battery", "ram" , "sim" etc which needs to be seperated and placed somewhere else
-			-- ram: (ROM, display, battery,sim) data is also given in this column 
-            -- battery: ram,rom,camera,display,fast charging data is also inside this column
-            -- display: ( height, digonals and width,camera,refresh rate,notch,camera, card,battery, os ) data is given in the same column
-			-- camera: front ,rare camera needs to be seperated
+			# ram: (ROM, display, battery,sim) data is also given in this column 
+            # battery: ram,rom,camera,display,fast charging data is also inside this column
+            # display: ( height, digonals and width,camera,refresh rate,notch,camera, card,battery, os ) data is given in the same column
+			# camera: front ,rare camera needs to be seperated
 				-- os, display, card,bluetooth in other column
-			-- card: camera, os, display, bluetooth, hybrid slot needs to be seperated
-            -- os: camera, card, fm radio needs to be seperated
-            
-        -- Feature Engineering
-			-- model -> Brand Name can be extracted from this column,  
-				-- There are many models named as "Poco" which should come under "Xiaomi" brand because 
-                -- its the same brand but the model name is different
-			-- battery: extract fast charging column
+			# card: camera, os, display, bluetooth, hybrid slot needs to be seperated
+            # os: camera, card, fm radio needs to be seperated
+
             
             
 -- creating a clone data for future mistakes
@@ -83,8 +76,7 @@ ADD COLUMN brand_name VARCHAR(50) AFTER `Index`;
 -- EXTRACTING BRAND NAME FROM MODEL COLUMN
 SET SQL_SAFE_UPDATES = 0;
 UPDATE smartphones AS l2
-SET brand_name = 
-				(SELECT SUBSTRING_INDEX(l1.model, ' ', 1) 
+SET brand_name = (SELECT SUBSTRING_INDEX(l1.model, ' ', 1) 
 				 FROM 
 				(SELECT * FROM smartphones) AS l1 
 				 WHERE l2.`Index` = l1.`Index`);
@@ -92,12 +84,10 @@ SET brand_name =
 /* fixed the whole brand_name column where Poco and POCO should be under Xiaomi Brand &
      Oppo is written in 2 different ways (OPPO & Oppo)   */
 UPDATE smartphones 
-SET brand_name = 
-				'Xiaomi' WHERE brand_name = 'Poco' OR brand_name = 'POCO';
+SET brand_name = 'Xiaomi' WHERE brand_name = 'Poco' OR brand_name = 'POCO';
 
 UPDATE smartphones
-SET brand_name = 
-				'Oppo' WHERE brand_name = 'OPPO';
+SET brand_name = 'Oppo' WHERE brand_name = 'OPPO';
 
 -- deleting the entire row - '755' because ipod data is given in smartphones table
 DELETE FROM smartphones
@@ -108,12 +98,10 @@ select * FROM smartphones;
 /*                   CLEANING THE PRICE COLUMN
               Removing these 2 symbols from price column ->  ? ,                         */
 UPDATE smartphones
-SET price = 
-			REPLACE(price, '?', '');
+SET price = REPLACE(price, '?', '');
 
 UPDATE smartphones
-SET price = 
-			ROUND(REPLACE(price, ',', ''),0);
+SET price = ROUND(REPLACE(price, ',', ''),0);
 
 -- changing the datatype of price column from text to integer
 ALTER TABLE smartphones
@@ -126,14 +114,13 @@ ALTER TABLE smartphones
 ADD COLUMN 5g_Available VARCHAR(15) AFTER sim;
 
 UPDATE smartphones AS l2
-SET 5g_Available = (
-SELECT 
-    CASE 
-        WHEN sim LIKE '%5G%' THEN 'yes' 
-        ELSE 'no' 
-    END AS supports_5G
-FROM (SELECT * FROM smartphones) l1
-WHERE L1.`Index` = l2.`Index`);
+SET 5g_Available = (SELECT 
+						CASE 
+							WHEN sim LIKE '%5G%' THEN 'yes' 
+							ELSE 'no' 
+						END AS supports_5G
+					FROM (SELECT * FROM smartphones) l1
+					WHERE L1.`Index` = l2.`Index`);
 
 -- Replacing 0's in rating column with average rating based on several price groups
 update smartphones t2
@@ -219,32 +206,27 @@ SET Processor_name =
 						WHERE a1.`Index` = a2.`Index`);
 -- Apple to --> Bionic
 UPDATE smartphones b1
-SET Processor_name =
-					(SELECT REPLACE(Processor_name,'Apple','Bionic') 
+SET Processor_name =(SELECT REPLACE(Processor_name,'Apple','Bionic') 
 						FROM (SELECT * FROM smartphones) b2 
                         WHERE b1.`Index`= b2.`Index`);
 -- A13 Bionic to --> Bionic A13
 UPDATE smartphones p1
-SET Processor_name =
-					(SELECT REPLACE(Processor_name,'A13 Bionic','Bionic A13')
+SET Processor_name =(SELECT REPLACE(Processor_name,'A13 Bionic','Bionic A13')
 						FROM (SELECT * FROM smartphones) p2 
 						WHERE p1.`Index` = p2.`Index`);
 -- Qualcomm Snapdragon 670 to --> Snapdragon 670
 UPDATE smartphones p1
-SET Processor_name =
-					(SELECT REPLACE(Processor_name,'Qualcomm ','') 
+SET Processor_name =(SELECT REPLACE(Processor_name,'Qualcomm ','') 
 						FROM (SELECT * FROM smartphones) p2 
 						WHERE p1.`Index` = p2.`Index`);
 -- Samsung Exynos 7885 to --> Exynos 7885
 UPDATE smartphones p1
-SET Processor_name =
-					(SELECT REPLACE(Processor_name,'Samsung ','') 
+SET Processor_name =(SELECT REPLACE(Processor_name,'Samsung ','') 
 						FROM (SELECT * FROM smartphones) p2 
                         WHERE p1.`Index` = p2.`Index`);
 -- Dimensity 8100-Max to --> Dimensity 8100 Max
 UPDATE smartphones p1
-SET Processor_name =
-					(SELECT REPLACE(Processor_name,'Dimensity 8100-Max','Dimensity 8100 Max') 
+SET Processor_name =(SELECT REPLACE(Processor_name,'Dimensity 8100-Max','Dimensity 8100 Max') 
                     FROM (SELECT * FROM smartphones) p2 
                     WHERE p1.`Index` = p2.`Index`);
 
@@ -267,22 +249,21 @@ ALTER TABLE smartphones
 ADD COLUMN RAM_IN_GB INT AFTER ram;
 
 UPDATE smartphones B1
-SET RAM_IN_GB = (
-SELECT 
-	CASE
-		WHEN RAM_1 LIKE '1GB RAM' THEN 1
-		WHEN RAM_1 LIKE '2GB RAM' THEN 2
-		WHEN RAM_1 LIKE '3GB RAM' THEN 3
-		WHEN RAM_1 LIKE '4GB RAM' THEN 4
-		WHEN RAM_1 LIKE '6GB RAM' THEN 6
-		WHEN RAM_1 LIKE '8GB RAM' THEN 8
-		WHEN RAM_1 LIKE '12GB RAM' THEN 12
-		WHEN RAM_1 LIKE '16GB RAM' THEN 16
-		WHEN RAM_1 LIKE '18GB RAM' THEN 18
-		ELSE 0
-	END AS A
-FROM (SELECT * FROM (select `Index`,substring_index(ram,',',1) AS RAM_1 from smartphones) A) B2
-WHERE B2.`Index` = B1.`Index`);
+SET RAM_IN_GB = (SELECT 
+					CASE
+						WHEN RAM_1 LIKE '1GB RAM' THEN 1
+						WHEN RAM_1 LIKE '2GB RAM' THEN 2
+						WHEN RAM_1 LIKE '3GB RAM' THEN 3
+						WHEN RAM_1 LIKE '4GB RAM' THEN 4
+						WHEN RAM_1 LIKE '6GB RAM' THEN 6
+						WHEN RAM_1 LIKE '8GB RAM' THEN 8
+						WHEN RAM_1 LIKE '12GB RAM' THEN 12
+						WHEN RAM_1 LIKE '16GB RAM' THEN 16
+						WHEN RAM_1 LIKE '18GB RAM' THEN 18
+						ELSE 0
+					END AS A
+				FROM (SELECT * FROM (select `Index`,substring_index(ram,',',1) AS RAM_1 from smartphones) A) B2
+				WHERE B2.`Index` = B1.`Index`);
 
 -- TOTAL 37 ROWS 
 select * from smartphones where RAM_IN_GB = 0;
@@ -294,14 +275,11 @@ THE SPECIFICATIONS ARE NOT UPTO THE MARK TO BE CALLED AS A SMARTPHONE HENCE WE C
 
 -- FIXING ALL 4 ROWS
 UPDATE smartphones
-SET RAM_IN_GB = 
-				4 WHERE `Index` = 440;
+SET RAM_IN_GB = 4 WHERE `Index` = 440;
 UPDATE smartphones
-SET RAM_IN_GB =
-				12 WHERE `Index` = 484;
+SET RAM_IN_GB =12 WHERE `Index` = 484;
 UPDATE smartphones
-SET RAM_IN_GB = 
-				1 WHERE `Index` = 858;
+SET RAM_IN_GB = 1 WHERE `Index` = 858;
 
 -- DELETING ALL OTHER ROWS WHERE RAM IS BELOW 1 GB BECAUSE IT SHOULD NOT BE CONSIDERED AS A SMARTPHONE
 DELETE FROM smartphones
@@ -315,8 +293,7 @@ ALTER TABLE smartphones
 ADD COLUMN ROM_IN_GB VARCHAR(20) AFTER RAM_IN_GB;
 
 UPDATE smartphones t1
-SET ROM_IN_GB = 
-			   (SELECT TRIM(I) as tr FROM (SELECT `Index`,
+SET ROM_IN_GB = (SELECT TRIM(I) as tr FROM (SELECT `Index`,
 				SUBSTRING_INDEX(SUBSTRING_INDEX(ram, ',', -1), ' ',2) AS I FROM smartphones) t2 
 				WHERE t1.`Index` = t2.`Index`);
 
@@ -345,28 +322,22 @@ WHERE `Index` = 156;
 
 -- FIXING OTHER ROWS 
 UPDATE smartphones
-SET ROM_IN_GB = 
-				1024 WHERE ROM_IN_GB = '1TB';
+SET ROM_IN_GB = 1024 WHERE ROM_IN_GB = '1TB';
 UPDATE smartphones
-SET ROM_IN_GB = 
-				64 WHERE ROM_IN_GB = '64GB inbuilt';
+SET ROM_IN_GB = 64 WHERE ROM_IN_GB = '64GB inbuilt';
 UPDATE smartphones
-SET ROM_IN_GB = 
-				512 WHERE ROM_IN_GB = '512GB inbuilt';
+SET ROM_IN_GB = 512 WHERE ROM_IN_GB = '512GB inbuilt';
 UPDATE smartphones
-SET ROM_IN_GB = 
-				64 WHERE ROM_IN_GB = '64GB inbuilt';
+SET ROM_IN_GB = 64 WHERE ROM_IN_GB = '64GB inbuilt';
 -- CONCLUDED AFTER ANALYZING MANUALLY
 UPDATE smartphones
-SET ROM_IN_GB = 
-				8 WHERE ROM_IN_GB = '1470mAh Battery';
+SET ROM_IN_GB = 8 WHERE ROM_IN_GB = '1470mAh Battery';
 
 SELECT * FROM smartphones;
 
 -- REMOVING ALL 'GB' FROM THIS COLUMN
 UPDATE smartphones t1
-SET ROM_IN_GB = 
-				(SELECT replace(ROM_IN_GB,'GB','') 
+SET ROM_IN_GB = (SELECT replace(ROM_IN_GB,'GB','') 
 					FROM (SELECT * FROM smartphones) t2
 					WHERE t1.`Index` = t2.`Index`);
 
@@ -383,8 +354,7 @@ ALTER TABLE smartphones
 ADD COLUMN `BATTERY_CAPACITY_(mAh)` VARCHAR(100) AFTER battery;
 
 UPDATE smartphones t1
-SET `BATTERY_CAPACITY_(mAh)` = 
-							(SELECT SUBSTRING_INDEX(battery,'mAh',1) 
+SET `BATTERY_CAPACITY_(mAh)` = (SELECT SUBSTRING_INDEX(battery,'mAh',1) 
 								FROM (SELECT * FROM smartphones) t2 
 								WHERE t1.`Index`= t2.`Index`);
                                
@@ -448,8 +418,7 @@ ADD COLUMN FAST_CHARGING_SPEED VARCHAR(20) AFTER `BATTERY_CAPACITY_(mAh)`;
 
 -- cleaning and extracting the charging-speed from the battery column by using the available data
 UPDATE smartphones t1
-SET FAST_CHARGING_SPEED = 
-						(SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(battery,'W',1),' ',-1) I 
+SET FAST_CHARGING_SPEED = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(battery,'W',1),' ',-1) I 
 						   FROM (SELECT * FROM smartphones) t2 
                            WHERE t1.`Index` = t2.`Index`);
 
@@ -587,9 +556,6 @@ select * from smartphones where `os` like '%Memory%';
 
 select os from smartphones
 group by os;
-
-
-
 
 -- CLEANING THE CAMERA COLUMN
 -- Extracting rare camera data from card column
