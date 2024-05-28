@@ -1,5 +1,6 @@
 **Dataset summary** :- This dataset is all about smartphones. It shows detailed informartion, specificcations and prices of each model of smartphones.  
-                   To know more about each columns of the dataset read File 3 (line 9 - 20 in My Sql) :- **Link** ➡️ https://github.com/Arijeet2k1/Data-cleaning-project/blob/main/Project_1_SQL.sql
+                   To know more about each columns of the dataset read File 3 line 9 to 20 here :-  
+                   **Link** ➡️ https://github.com/Arijeet2k1/Data-cleaning-project/blob/main/Project_1_SQL.sql
 
 
 
@@ -9,7 +10,7 @@
 **Uploaded Files** ⬇️
 
   **FILE 1 -** Smartphones_Dirty_Data.csv ( This is the raw data )
-           It includes dirty and messy data that needs to be fixed.
+           It includes dirty and messy data that needs to be fixed.  
            **Link** ➡️ https://github.com/Arijeet2k1/Data-cleaning-project/blob/main/Smartphones_Dirty_Data.csv
   
   **FILE 2 -** SMARTPHONES_CLEANED.csv ( This is the result of the whole data cleaning process )
