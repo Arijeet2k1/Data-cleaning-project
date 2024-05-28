@@ -1,6 +1,7 @@
 Dataset summary :- This data is all about smartphones. It shows detailed informartion, specificcations and prices of each model of smartphones.
 
-    To know more about each columns of the dataset read File 3 (line 9 - 20 in My Sql) :- Link ➡️ https://github.com/Arijeet2k1/Data-cleaning-project/blob/main/Project_1_SQL.sql
+    To know more about each columns of the dataset read File 3 (line 9 - 20 in My Sql) :- 
+    Link ➡️ https://github.com/Arijeet2k1/Data-cleaning-project/blob/main/Project_1_SQL.sql
                    
 Project Summary :- I have a dataset named "smartphones" that is currently complex and difficult to interpret. My aim is to transform this data into 
                    a more accessible format, making it easy to understand and summarize. This will enable meaningful insights to be drawn from the data.
